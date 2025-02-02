@@ -1,11 +1,6 @@
-import React from 'react'
+import OverviewStats from "@/components/employer/OverviewStats";
 
-const page = () => {
-  return (
-    <div>
-      <h1>Employer and Requires Authentication</h1>
-    </div>
-  )
+export default function EmployerDashboard() {
+  return <OverviewStats />
 }
 
-export default page

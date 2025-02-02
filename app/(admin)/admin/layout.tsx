@@ -1,8 +1,5 @@
 import NavBar from "@/components/admin/NavBar";
 import { Sidebar } from "@/components/admin/Sidebar";
-import { Inter } from "next/font/google";
-
-const inter = Inter({ subsets: ["latin"] });
 
 export default function AdminLayout({
   children,
@@ -10,7 +7,7 @@ export default function AdminLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className={inter.className}>
+    <div>
       <div className="flex h-screen overflow-hidden">
         <Sidebar />
         <div className="flex flex-col flex-1 overflow-hidden">

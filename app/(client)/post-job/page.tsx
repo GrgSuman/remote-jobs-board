@@ -1,437 +1,538 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Twitter, Linkedin } from "lucide-react"
-import Tiptap from "@/components/forms/TipTap"
+import { useState } from "react";
+import { ArrowLeft, Building2, MapPin, Rocket } from "lucide-react";
+import Link from "next/link";
+import Tiptap from "@/components/forms/TipTap";
 
-const categories = [
-  "UI/UX Design",
-  "Product Design",
-  "UX Research",
-  "UI Design",
-  "Visual Design",
-  "UX Writing",
-  "Interaction Design",
-]
+// Dummy data for demonstration
+const jobTypes = ["Full Time", "Part Time", "Contract", "Freelance"];
+const experienceLevels = ["Entry Level", "Mid Level", "Senior", "Lead"];
+const dummySkills = [
+  "React",
+  "TypeScript",
+  "Node.js",
+  "Python",
+  "JavaScript",
+  "SQL",
+  "AWS",
+  "Docker",
+  "Kubernetes",
+];
 
-const salaryRanges = [
-  "Under $50,000",
-  "$50,000 - $70,000",
-  "$70,000 - $90,000",
-  "$90,000 - $120,000",
-  "$120,000 - $150,000",
-  "$150,000+",
-]
+const companyLogos = [
+  {
+    name: "AWS",
+    src: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Amazon_Web_Services_Logo.svg/768px-Amazon_Web_Services_Logo.svg.png",
+  },
+  {
+    name: "Microsoft",
+    src: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTbfB_mW4QR3VaGmRaKg8vswW2zx1A0-a-ARA&s",
+  },
+  {
+    name: "IBM",
+    src: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRTi9JJ70--KjzJwSMeqLDzfLEEsvE1vdRLGg&s",
+  },
+  {
+    name: "GitHub",
+    src: "https://images.seeklogo.com/logo-png/27/2/github-logo-png_seeklogo-273183.png",
+  },
+  {
+    name: "Mozilla",
+    src: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR8fEiDXgDYXmb3hCj_kALZXikozaPuexzgNw&s",
+  },
+];
 
-export default function PostJob() {
+export default function PostJobForm() {
+  const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
+  const [newSkill, setNewSkill] = useState("");
   const [formData, setFormData] = useState({
-    // Company Details
+    title: "",
+    type: "",
+    experience: "",
+    location: "",
+    salaryRange: "",
+    description: "",
+    applicationLink: "",
     companyName: "",
+    companyWebsite: "",
     companyLogo: "",
-    companyDescription: "",
-    companyTwitter: "",
-    companyLinkedin: "",
-
-    // Job Basics
-    position: "",
-    category: "",
-    type: "fullTime",
-    salary: "",
-
-    // Job Details
-    location: "remote",
-    jobDescription: "",
-    requirements: "",
-    howToApply: "",
-
-    // Highlight Options
-    highlightPost: false,
+    isHighlighted: false,
     showLogo: false,
     pinDuration: "", // "24h", "7d", "30d"
-  })
+  });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    console.log(formData)
-    // Handle form submission
-  }
+  const handleSkillAdd = () => {
+    if (newSkill && !selectedSkills.includes(newSkill)) {
+      setSelectedSkills([...selectedSkills, newSkill]);
+      setNewSkill("");
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log({ ...formData, skills: selectedSkills });
+  };
 
   const calculateTotal = () => {
-    let total = 29 // Base price
-    if (formData.highlightPost) total += 9
-    if (formData.showLogo) total += 9
-    if (formData.pinDuration === "24h") total += 9
-    if (formData.pinDuration === "7d") total += 19
-    if (formData.pinDuration === "30d") total += 29
-    return total
-  }
+    let total = 299; // Base price
+    if (formData.isHighlighted) total += 99;
+    if (formData.showLogo) total += 99;
+    if (formData.pinDuration === "24h") total += 99;
+    if (formData.pinDuration === "7d") total += 199;
+    if (formData.pinDuration === "30d") total += 299;
+    return total;
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <main className="container mx-auto px-4 py-8">
-        <div className="max-w-4xl mx-auto">
-          <div className="mb-12">
-            <h1 className="text-4xl font-bold mb-4">Hire top designers, UX researchers and UX writers</h1>
-            <p className="text-xl text-gray-600">
-              Let us help you find the best designers to grow your team. No account or sign-up required to post your
-              job.
+      <div className="max-w-4xl mx-auto px-4 py-8">
+        <Link
+          href="/"
+          className="flex items-center text-gray-600 mb-4 hover:text-gray-900 transition-colors"
+        >
+          <ArrowLeft className="mr-2" size={20} />
+          Back to Job Board
+        </Link>
+
+        {/* Stats Section */}
+        <div className="bg-white rounded-lg shadow-sm p-8 mb-8">
+          <div className="text-center max-w-2xl mx-auto">
+            <h1 className="text-3xl font-bold mb-4">Hire Remote Talent</h1>
+            <p className="text-gray-600 mb-8">
+              Reach over 3,400,000+ remote workers and find your next team
+              member
             </p>
-          </div>
 
-          <form onSubmit={handleSubmit} className="space-y-12">
-            {/* Job Details */}
-            <div className="bg-white rounded-lg shadow-sm p-6">
-              <h2 className="text-2xl font-semibold mb-6">Job Details</h2>
-
-              <div className="space-y-6">
-                <div>
-                  <label htmlFor="position" className="block font-medium mb-1">
-                    Position*
-                  </label>
-                  <input
-                    type="text"
-                    id="position"
-                    placeholder="e.g. Senior Product Designer"
-                    className="w-full px-3 py-2 border rounded-md"
-                    value={formData.position}
-                    onChange={(e) => setFormData({ ...formData, position: e.target.value })}
-                    required
-                  />
-                  <p className="text-sm text-gray-500 mt-1">
-                    Please specify a single job position.
-                  </p>
-                </div>
-
-                <div>
-                  <label htmlFor="category" className="block font-medium mb-1">
-                    Category*
-                  </label>
-                  <select
-                    id="category"
-                    className="w-full px-3 py-2 border rounded-md"
-                    value={formData.category}
-                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                    required
-                  >
-                    <option value="">Select a category</option>
-                    {categories.map((category) => (
-                      <option key={category} value={category}>
-                        {category}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block font-medium mb-1">Type*</label>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    {["Full Time", "Part Time", "Contract", "Casual"].map((type) => (
-                      <label key={type} className="flex items-center">
-                        <input
-                          type="radio"
-                          name="type"
-                          value={type.toLowerCase().replace(" ", "")}
-                          checked={formData.type === type.toLowerCase().replace(" ", "")}
-                          onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-                          className="mr-2"
-                        />
-                        {type}
-                      </label>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <label htmlFor="salary" className="block font-medium mb-1">
-                    Salary (optional)
-                  </label>
-                  <select
-                    id="salary"
-                    className="w-full px-3 py-2 border rounded-md"
-                    value={formData.salary}
-                    onChange={(e) => setFormData({ ...formData, salary: e.target.value })}
-                  >
-                    <option value="">Select salary range</option>
-                    {salaryRanges.map((range) => (
-                      <option key={range} value={range}>
-                        {range}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block font-medium mb-1">Location*</label>
-                  <div className="space-y-2">
-                    <label className="flex items-center">
-                      <input
-                        type="radio"
-                        name="location"
-                        value="remote"
-                        checked={formData.location === "remote"}
-                        onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                        className="mr-2"
-                      />
-                      Remote
-                    </label>
-                    <label className="flex items-center">
-                      <input
-                        type="radio"
-                        name="location"
-                        value="onsite"
-                        checked={formData.location === "onsite"}
-                        onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                        className="mr-2"
-                      />
-                      On-site
-                    </label>
-                    <label className="flex items-center">
-                      <input
-                        type="radio"
-                        name="location"
-                        value="hybrid"
-                        checked={formData.location === "hybrid"}
-                        onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                        className="mr-2"
-                      />
-                      Hybrid
-                    </label>
-                  </div>
-                </div>
-
-                <div>
-                  <label htmlFor="jobDescription" className="block font-medium mb-1">
-                    Job Description*
-                  </label>
-                  <ul>
-                    <li>as</li>
-                    <li>sdas sad</li>
-                  </ul>
-                  <Tiptap/>
-                  {/* <textarea
-                    id="jobDescription"
-                    rows={6}
-                    className="w-full px-3 py-2 border rounded-md"
-                    value={formData.jobDescription}
-                    onChange={(e) => setFormData({ ...formData, jobDescription: e.target.value })}
-                    required
-                    placeholder="Describe the role, responsibilities, and what you're looking for in a candidate..."
-                  /> */}
-                </div>
-
-                <div>
-                  <label htmlFor="requirements" className="block font-medium mb-1">
-                    Requirements*
-                  </label>
-                  <textarea
-                    id="requirements"
-                    rows={4}
-                    className="w-full px-3 py-2 border rounded-md"
-                    value={formData.requirements}
-                    onChange={(e) => setFormData({ ...formData, requirements: e.target.value })}
-                    required
-                    placeholder="List the required skills, experience, and qualifications..."
-                  />
-                </div>
-
-                <div>
-                  <label htmlFor="howToApply" className="block font-medium mb-1">
-                    How to Apply*
-                  </label>
-                  <input
-                    type="url"
-                    id="howToApply"
-                    placeholder="e.g. https://mycompany.com/careers/apply"
-                    className="w-full px-3 py-2 border rounded-md"
-                    value={formData.howToApply}
-                    onChange={(e) => setFormData({ ...formData, howToApply: e.target.value })}
-                    required
-                  />
-                  <p className="text-sm text-gray-500 mt-1">
-                    Link to the application page/email address (this email is public).
-                  </p>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+              <div>
+                <div className="text-2xl font-bold text-blue-600">3.4M+</div>
+                <div className="text-sm text-gray-600">Monthly Visitors</div>
+              </div>
+              <div>
+                <div className="text-2xl font-bold text-blue-600">150k+</div>
+                <div className="text-sm text-gray-600">Remote Workers</div>
+              </div>
+              <div>
+                <div className="text-2xl font-bold text-blue-600">98%</div>
+                <div className="text-sm text-gray-600">Response Rate</div>
+              </div>
+              <div>
+                <div className="text-2xl font-bold text-blue-600">24h</div>
+                <div className="text-sm text-gray-600">
+                  Average Time to Hire
                 </div>
               </div>
             </div>
 
-            {/* Company Details */}
-            <div className="bg-white rounded-lg shadow-sm p-6">
-              <h2 className="text-2xl font-semibold mb-6">Company Details</h2>
+            <div className="mt-8">
+              <p className="text-sm text-gray-500 mb-4">
+                Trusted by leading companies worldwide
+              </p>
+              <div className="flex flex-wrap justify-center gap-8 items-center opacity-75">
+                {companyLogos.map((logo) => (
+                  <img
+                    key={logo.name}
+                    src={logo.src || "/placeholder.svg"}
+                    alt={logo.name}
+                    className="h-8 object-contain"
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
 
-              <div className="space-y-6">
+        {/* Main Form */}
+        <div className="bg-white rounded-lg shadow-sm p-8">
+          <form onSubmit={handleSubmit} className="space-y-8">
+            {/* Job Details */}
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold">Job Details</h2>
+
+              <div>
+                <label
+                  htmlFor="title"
+                  className="block mb-2 font-medium text-gray-700"
+                >
+                  Job Title
+                </label>
+                <input
+                  type="text"
+                  id="title"
+                  value={formData.title}
+                  onChange={(e) =>
+                    setFormData({ ...formData, title: e.target.value })
+                  }
+                  placeholder="e.g. Senior Frontend Developer"
+                  className="w-full px-4 py-3 text-lg border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                />
+                <p className="mt-2 text-sm text-gray-500">
+                  Be specific — job titles like "Senior React Developer" work
+                  better than "Developer Needed"
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label htmlFor="companyName" className="block font-medium mb-1">
-                    Company Name*
+                  <label
+                    htmlFor="type"
+                    className="block mb-2 font-medium text-gray-700"
+                  >
+                    Job Type
                   </label>
+                  <select
+                    id="type"
+                    value={formData.type}
+                    onChange={(e) =>
+                      setFormData({ ...formData, type: e.target.value })
+                    }
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                  >
+                    <option value="">Select type</option>
+                    {jobTypes.map((type) => (
+                      <option key={type} value={type.toLowerCase()}>
+                        {type}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="experience"
+                    className="block mb-2 font-medium text-gray-700"
+                  >
+                    Experience Level
+                  </label>
+                  <select
+                    id="experience"
+                    value={formData.experience}
+                    onChange={(e) =>
+                      setFormData({ ...formData, experience: e.target.value })
+                    }
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                  >
+                    <option value="">Select level</option>
+                    {experienceLevels.map((level) => (
+                      <option key={level} value={level.toLowerCase()}>
+                        {level}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label
+                    htmlFor="location"
+                    className="block mb-2 font-medium text-gray-700"
+                  >
+                    Location
+                  </label>
+                  <div className="relative">
+                    <MapPin
+                      className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                      size={20}
+                    />
+                    <input
+                      type="text"
+                      id="location"
+                      value={formData.location}
+                      onChange={(e) =>
+                        setFormData({ ...formData, location: e.target.value })
+                      }
+                      placeholder="e.g. Remote, Worldwide"
+                      className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="salary"
+                    className="block mb-2 font-medium text-gray-700"
+                  >
+                    Salary Range
+                  </label>
+                  <select
+                    id="salary"
+                    value={formData.salaryRange}
+                    onChange={(e) =>
+                      setFormData({ ...formData, salaryRange: e.target.value })
+                    }
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                  >
+                    <option value="">Select range</option>
+                    <option value="$50k - $70k">$50k - $70k</option>
+                    <option value="$70k - $90k">$70k - $90k</option>
+                    <option value="$90k - $120k">$90k - $120k</option>
+                    <option value="$120k - $150k">$120k - $150k</option>
+                    <option value="$150k+">$150k+</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block mb-2 font-medium text-gray-700">
+                  Required Skills
+                </label>
+                <div className="flex flex-wrap gap-2 mb-3">
+                  {selectedSkills.map((skill) => (
+                    <span
+                      key={skill}
+                      onClick={() =>
+                        setSelectedSkills(
+                          selectedSkills.filter((s) => s !== skill)
+                        )
+                      }
+                      className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm cursor-pointer hover:bg-blue-200"
+                    >
+                      {skill} ×
+                    </span>
+                  ))}
+                </div>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={newSkill}
+                    onChange={(e) => setNewSkill(e.target.value)}
+                    onKeyPress={(e) =>
+                      e.key === "Enter" &&
+                      (e.preventDefault(), handleSkillAdd())
+                    }
+                    placeholder="Add a skill"
+                    className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleSkillAdd}
+                    className="px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
+                  >
+                    Add
+                  </button>
+                </div>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {dummySkills
+                    .filter((skill) => !selectedSkills.includes(skill))
+                    .map((skill) => (
+                      <span
+                        key={skill}
+                        onClick={() =>
+                          setSelectedSkills([...selectedSkills, skill])
+                        }
+                        className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm cursor-pointer hover:bg-gray-200"
+                      >
+                        {skill}
+                      </span>
+                    ))}
+                </div>
+              </div>
+
+              <div>
+                <label
+                  htmlFor="description"
+                  className="block mb-2 font-medium text-gray-700"
+                >
+                  Job Description
+                </label>
+                <Tiptap />
+              </div>
+            </div>
+
+            {/* Company Details */}
+            <div className="space-y-6 pt-8 border-t">
+              <h2 className="text-xl font-semibold">Company Details</h2>
+
+              <div>
+                <label
+                  htmlFor="companyName"
+                  className="block mb-2 font-medium text-gray-700"
+                >
+                  Company Name
+                </label>
+                <div className="relative">
+                  <Building2
+                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                    size={20}
+                  />
                   <input
                     type="text"
                     id="companyName"
-                    className="w-full px-3 py-2 border rounded-md"
                     value={formData.companyName}
-                    onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
-                    required
+                    onChange={(e) =>
+                      setFormData({ ...formData, companyName: e.target.value })
+                    }
+                    placeholder="Your company name"
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label
+                    htmlFor="companyWebsite"
+                    className="block mb-2 font-medium text-gray-700"
+                  >
+                    Company Website
+                  </label>
+                  <input
+                    type="url"
+                    id="companyWebsite"
+                    value={formData.companyWebsite}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        companyWebsite: e.target.value,
+                      })
+                    }
+                    placeholder="https://example.com"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="companyLogo" className="block font-medium mb-1">
+                  <label
+                    htmlFor="companyLogo"
+                    className="block mb-2 font-medium text-gray-700"
+                  >
                     Company Logo URL
                   </label>
                   <input
                     type="url"
                     id="companyLogo"
-                    className="w-full px-3 py-2 border rounded-md"
                     value={formData.companyLogo}
-                    onChange={(e) => setFormData({ ...formData, companyLogo: e.target.value })}
-                    placeholder="https://..."
-                  />
-                  <p className="text-sm text-gray-500 mt-1">Optional: Link to your company logo</p>
-                </div>
-
-                <div>
-                  <label htmlFor="companyDescription" className="block font-medium mb-1">
-                    Company Description*
-                  </label>
-                  <textarea
-                    id="companyDescription"
-                    rows={4}
-                    className="w-full px-3 py-2 border rounded-md"
-                    value={formData.companyDescription}
-                    onChange={(e) => setFormData({ ...formData, companyDescription: e.target.value })}
-                    required
+                    onChange={(e) =>
+                      setFormData({ ...formData, companyLogo: e.target.value })
+                    }
+                    placeholder="https://example.com/logo.png"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
                   />
                 </div>
+              </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label htmlFor="companyTwitter" className="block font-medium mb-1">
-                      <Twitter className="inline-block w-4 h-4 mr-1" />
-                      Twitter Profile
-                    </label>
-                    <input
-                      type="url"
-                      id="companyTwitter"
-                      className="w-full px-3 py-2 border rounded-md"
-                      value={formData.companyTwitter}
-                      onChange={(e) => setFormData({ ...formData, companyTwitter: e.target.value })}
-                      placeholder="https://twitter.com/..."
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="companyLinkedin" className="block font-medium mb-1">
-                      <Linkedin className="inline-block w-4 h-4 mr-1" />
-                      LinkedIn Profile
-                    </label>
-                    <input
-                      type="url"
-                      id="companyLinkedin"
-                      className="w-full px-3 py-2 border rounded-md"
-                      value={formData.companyLinkedin}
-                      onChange={(e) => setFormData({ ...formData, companyLinkedin: e.target.value })}
-                      placeholder="https://linkedin.com/company/..."
-                    />
-                  </div>
-                </div>
+              <div>
+                <label
+                  htmlFor="applicationLink"
+                  className="block mb-2 font-medium text-gray-700"
+                >
+                  Application URL
+                </label>
+                <input
+                  type="url"
+                  id="applicationLink"
+                  value={formData.applicationLink}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      applicationLink: e.target.value,
+                    })
+                  }
+                  placeholder="https://example.com/careers/apply"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                />
               </div>
             </div>
 
-            {/* Highlight Options */}
-            <div className="bg-white rounded-lg shadow-sm p-6">
-              <h2 className="text-2xl font-semibold mb-6">Highlight</h2>
+            {/* Feature Post */}
+            <div className="space-y-6 pt-8 border-t">
+              <div className="flex items-center justify-between">
+                <h2 className="text-xl font-semibold">Feature Post</h2>
+                <div className="text-sm text-gray-500">
+                  Starting from <span className="font-semibold">$299</span>
+                </div>
+              </div>
 
-              <div className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <label className="relative flex flex-col p-6 bg-white border border-gray-200 rounded-lg cursor-pointer hover:border-blue-500">
+                  <input
+                    type="checkbox"
+                    checked={formData.isHighlighted}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        isHighlighted: e.target.checked,
+                      })
+                    }
+                    className="absolute top-4 right-4"
+                  />
+                  <Rocket className="w-8 h-8 mb-3 text-blue-500" />
+                  <h3 className="font-semibold mb-1">Highlight Post</h3>
+                  <p className="text-sm text-gray-600">
+                    Stand out with a highlighted background
+                  </p>
+                  <div className="mt-2 text-blue-600 font-semibold">+$99</div>
+                </label>
+
+                <label className="relative flex flex-col p-6 bg-white border border-gray-200 rounded-lg cursor-pointer hover:border-blue-500">
+                  <input
+                    type="checkbox"
+                    checked={formData.showLogo}
+                    onChange={(e) =>
+                      setFormData({ ...formData, showLogo: e.target.checked })
+                    }
+                    className="absolute top-4 right-4"
+                  />
+                  <Building2 className="w-8 h-8 mb-3 text-blue-500" />
+                  <h3 className="font-semibold mb-1">Company Logo</h3>
+                  <p className="text-sm text-gray-600">
+                    Display your company logo
+                  </p>
+                  <div className="mt-2 text-blue-600 font-semibold">+$99</div>
+                </label>
+
                 <div className="space-y-4">
-                  <label className="flex items-start">
-                    <input
-                      type="checkbox"
-                      className="mt-1 mr-3"
-                      checked={formData.highlightPost}
-                      onChange={(e) => setFormData({ ...formData, highlightPost: e.target.checked })}
-                    />
-                    <div>
-                      <span className="font-medium">Highlight your job post</span>
-                      <span className="ml-1 text-gray-600">(+$9)</span>
-                    </div>
-                  </label>
-
-                  <label className="flex items-start">
-                    <input
-                      type="checkbox"
-                      className="mt-1 mr-3"
-                      checked={formData.showLogo}
-                      onChange={(e) => setFormData({ ...formData, showLogo: e.target.checked })}
-                    />
-                    <div>
-                      <span className="font-medium">Show the company's logo besides your job post</span>
-                      <span className="ml-1 text-gray-600">(+$9)</span>
-                    </div>
-                  </label>
-                </div>
-
-                <div className="space-y-3">
-                  <label className="flex items-start">
-                    <input
-                      type="radio"
-                      name="pinDuration"
-                      value="24h"
-                      className="mt-1 mr-3"
-                      checked={formData.pinDuration === "24h"}
-                      onChange={(e) => setFormData({ ...formData, pinDuration: e.target.value })}
-                    />
-                    <div>
-                      <span className="font-medium">Pin your post to the top of frontpage for 24 hours</span>
-                      <span className="ml-1 text-gray-600">(+$9)</span>
-                    </div>
-                  </label>
-
-                  <label className="flex items-start">
-                    <input
-                      type="radio"
-                      name="pinDuration"
-                      value="7d"
-                      className="mt-1 mr-3"
-                      checked={formData.pinDuration === "7d"}
-                      onChange={(e) => setFormData({ ...formData, pinDuration: e.target.value })}
-                    />
-                    <div>
-                      <span className="font-medium">Pin your post to the top of frontpage for 7 days</span>
-                      <span className="ml-1 text-gray-600">(+$19)</span>
-                    </div>
-                  </label>
-
-                  <label className="flex items-start">
-                    <input
-                      type="radio"
-                      name="pinDuration"
-                      value="30d"
-                      className="mt-1 mr-3"
-                      checked={formData.pinDuration === "30d"}
-                      onChange={(e) => setFormData({ ...formData, pinDuration: e.target.value })}
-                    />
-                    <div>
-                      <span className="font-medium">Pin your post to the top of frontpage for 30 days</span>
-                      <span className="ml-1 text-gray-600">(+$29)</span>
-                    </div>
-                  </label>
+                  <p className="font-medium text-gray-700">Pin Duration</p>
+                  {[
+                    { value: "24h", label: "24 hours", price: 99 },
+                    { value: "7d", label: "7 days", price: 199 },
+                    { value: "30d", label: "30 days", price: 299 },
+                  ].map((option) => (
+                    <label
+                      key={option.value}
+                      className="flex items-center justify-between p-3 border border-gray-200 rounded-lg cursor-pointer hover:border-blue-500"
+                    >
+                      <div className="flex items-center">
+                        <input
+                          type="radio"
+                          name="pinDuration"
+                          value={option.value}
+                          checked={formData.pinDuration === option.value}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              pinDuration: e.target.value,
+                            })
+                          }
+                          className="mr-3"
+                        />
+                        <span>{option.label}</span>
+                      </div>
+                      <span className="text-blue-600 font-semibold">
+                        +${option.price}
+                      </span>
+                    </label>
+                  ))}
                 </div>
               </div>
             </div>
 
-            {/* Payment Details */}
-            {/* Removed Payment Details section */}
-
-            <div className="mt-8">
+            <div className="pt-8">
               <button
                 type="submit"
-                className="w-full bg-red-500 text-white font-semibold py-4 px-8 rounded-md hover:bg-red-600 transition duration-300 text-lg"
+                className="w-full flex justify-center py-4 px-4 border border-transparent rounded-lg shadow-sm text-lg font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
               >
-                Post your job — ${calculateTotal()}
+                Post Job — ${calculateTotal()}
               </button>
+              <p className="mt-4 text-center text-sm text-gray-500">
+                💡 A discount of 10% will be applied at checkout
+              </p>
             </div>
           </form>
         </div>
-      </main>
+      </div>
     </div>
-  )
+  );
 }
-
