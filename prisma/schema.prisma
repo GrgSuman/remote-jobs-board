@@ -11,17 +11,116 @@ datasource db {
 }
 
 
+// Base User Model
 model User {
   id            String    @id @default(cuid())
   email         String    @unique
   password      String?
   name          String?
-  userType      String    @default("seeker")
+  userType      String    @default("seeker") // "seeker", "employer", "admin"
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   profileImage  String?
   authProvider  String?
   bio           String?
   location      String?
+
+  // Relationships
+  companies     Company[] // An employer can manage multiple companies
+  jobs          Job[]     // An employer can post multiple jobs
+  boosts        Boost[]   // An employer can boost multiple jobs
+  impressions   Impression[] // An employer can track impressions for their jobs
+
+  @@map("users")
 }
 
+// Model for Companies
+model Company {
+  id          Int       @id @default(autoincrement())
+  name        String    @unique
+  description String?
+  logo        String?   // URL to the company logo
+  website     String?
+  linkedinURL String  @default("")
+  twitterURL  String  @default("")
+  industry    String?
+  size        String?   // Company size (e.g., "1-10 employees")
+  remotePolicy String?  // Remote work policy (e.g., "Fully Remote")
+  userId      String    // Foreign key to the User (employer)
+  user        User      @relation(fields: [userId], references: [id])
+  jobs        Job[]     // One company can have multiple jobs
+
+  @@map("companies")
+}
+
+
+// Model for Job Categories
+model Category {
+  id          Int       @id @default(autoincrement())
+  name        String    @unique
+  description String?   // Optional description of the category
+  jobs        Job[]     // One category can have many jobs
+  isActive    Boolean   @default(true) // Whether the category is active
+
+  @@map("categories")
+}
+
+// Model for Job Postings
+model Job {
+  id          Int       @id @default(autoincrement())
+  title       String
+  description String
+  type        String    // Job type (e.g., "Full-time", "Part-time", "Contract")
+  salaryRange String?   // Salary range (e.g., "$80k - $100k")
+  location    String?   // Location (e.g., "Remote in Australia")
+  skills      Skill[]   // Required skills
+  experience  String?   // Required experience (e.g., "Mid-level")
+  applicationLink String // Link to the external application page
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  companyId   Int?      // Foreign key to the Company (optional)
+  company     Company?  @relation(fields: [companyId], references: [id])
+  userId      String    // Foreign key to the User (employer)
+  user        User      @relation(fields: [userId], references: [id])
+  boosts      Boost[]   // One job can have multiple boosts
+  impressions Impression[] // One job can have multiple impressions
+  categoryId  Int      // Foreign key to the Category
+  category    Category @relation(fields: [categoryId], references: [id]) // Many-to-one relationship with Category
+
+  @@map("jobs")
+}
+
+model Skill {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  isActive  Boolean  @default(true) // Whether the skill is active
+  jobs      Job[]    // Many-to-many relationship with Job
+}
+
+// Model for Job Boosts (Premium Feature)
+model Boost {
+  id          Int       @id @default(autoincrement())
+  jobId       Int       // Foreign key to the Job
+  job         Job       @relation(fields: [jobId], references: [id])
+  startDate   DateTime  // Start date of the boost
+  endDate     DateTime  // End date of the boost
+  cost        Float     // Cost of the boost (e.g., 50.00)        
+  status      String    @default("active") // Status of the boost (e.g., "active", "expired")
+  userId      String    // Foreign key to the User (employer)
+  user        User      @relation(fields: [userId], references: [id])
+
+  @@map("boosts")
+}
+
+// Model for Job Impressions (Analytics)
+model Impression {
+  id          Int       @id @default(autoincrement())
+  jobId       Int       // Foreign key to the Job
+  job         Job       @relation(fields: [jobId], references: [id])
+  viewedAt    DateTime  @default(now()) // Timestamp of the impression
+  clicked     Boolean   @default(false) // Whether the job was clicked
+  userId      String    // Foreign key to the User (employer)
+  user        User      @relation(fields: [userId], references: [id])
+
+  @@map("impressions")
+}

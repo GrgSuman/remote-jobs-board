@@ -1,19 +1,25 @@
 "use client"
 
 import Link from "next/link"
-import { useState } from "react"
-import { Menu, X } from "lucide-react"
+import { useState, useEffect, useRef } from "react"
+import { Menu, X, ChevronDown, LogOut } from "lucide-react"
 import { usePathname } from "next/navigation"
+import { logout } from "@/actions/auth/user"
 
 const Header2 = ({ user }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+  const dropdownRef = useRef(null)
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen)
   }
 
+  const toggleDropdown = () => {
+    setIsDropdownOpen(!isDropdownOpen)
+  }
+
   const pathname = usePathname()
-  if (pathname.startsWith("/admin")) return null
 
   const menuItems = [
     { href: "#", label: "Twitter" },
@@ -28,6 +34,21 @@ const Header2 = ({ user }) => {
         label: user.email[0],
       }
     : { href: "/login", label: "Sign in" }
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsDropdownOpen(false)
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside)
+    }
+  }, [])
+
+  if (pathname.startsWith("/admin") || pathname.startsWith("/seeker") || pathname.startsWith("/employer")) return null
 
   return (
     <header className="border-b bg-white">
@@ -50,23 +71,53 @@ const Header2 = ({ user }) => {
                 {item.label}
               </Link>
             ))}
-            <Link
-              href={userLink.href}
-              className={`${
-                user
-                  ? "text-white bg-blue-500 block rounded-full px-[17px] py-[10px]"
-                  : "text-red-500 hover:text-red-600"
-              } font-medium transition-colors`}
-            >
-              {userLink.label}
-            </Link>
+            {user ? (
+              <div className="relative" ref={dropdownRef}>
+                <button
+                  onClick={toggleDropdown}
+                  className="flex items-center space-x-2 text-red-500 hover:text-red-600 font-medium transition-colors"
+                >
+                  <span className="w-8 h-8 flex items-center justify-center bg-blue-500 text-white rounded-full">
+                    {userLink.label}
+                  </span>
+                  <ChevronDown size={20} />
+                </button>
+                {isDropdownOpen && (
+                  <div className="absolute right-0 mt-2 w-56 bg-white rounded-md shadow-lg py-2 z-10">
+                    <Link
+                      href={userLink.href}
+                      className="block hover:bg-gray-100 px-4 py-3 text-red-500 font-medium hover:text-red-600 transition-colors"
+                      onClick={() => setIsDropdownOpen(false)}
+                    >
+                      Dashboard
+                    </Link>
+                    <button
+                      className="block hover:bg-gray-100 w-full text-left px-4 py-3 text-red-500 font-medium hover:text-red-600 transition-colors"
+                      onClick={() => {
+                        setIsDropdownOpen(false)
+                        logout()
+                      }}
+                    >
+                      <span className="flex items-center">
+                        <LogOut size={18} className="mr-2" />
+                        Logout
+                      </span>
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <Link href={userLink.href} className="text-red-500 hover:text-red-600 font-medium transition-colors">
+                {userLink.label}
+              </Link>
+            )}
           </nav>
 
           {/* Mobile menu button */}
           <div className="md:hidden">
             <button
               onClick={toggleMenu}
-              className="text-gray-500 hover:text-gray-600 focus:outline-none focus:text-gray-600"
+              className="text-gray-500 hover:text-red-500 focus:outline-none focus:text-red-500"
               aria-label="Toggle menu"
             >
               {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -88,17 +139,54 @@ const Header2 = ({ user }) => {
                   {item.label}
                 </Link>
               ))}
-              <Link
-                href={userLink.href}
-                className={`${
-                  user
-                    ? "text-white w-[fit-content] bg-blue-500 rounded-full px-4 py-2 inline-block"
-                    : "text-red-500 hover:text-red-600"
-                } font-medium transition-colors`}
-                onClick={() => setIsMenuOpen(false)}
-              >
-                {user ? `Dashboard (${userLink.label})` : userLink.label}
-              </Link>
+              {user ? (
+                <div className="relative" ref={dropdownRef}>
+                  <button
+                    onClick={toggleDropdown}
+                    className="flex items-center space-x-2 text-red-500 hover:text-red-600 font-medium transition-colors"
+                  >
+                    <span className="w-8 h-8 flex items-center justify-center bg-blue-500 text-white rounded-full">
+                      {userLink.label}
+                    </span>
+                    <ChevronDown size={20} />
+                  </button>
+                  {isDropdownOpen && (
+                    <div className="mt-2 bg-white rounded-md shadow-lg py-2">
+                      <Link
+                        href={userLink.href}
+                        className="block px-4 py-3 text-red-500 font-medium hover:text-red-600 transition-colors hover:bg-gray-100"
+                        onClick={() => {
+                          setIsDropdownOpen(false)
+                          setIsMenuOpen(false)
+                        }}
+                      >
+                        Dashboard
+                      </Link>
+                      <button
+                        className="block w-full text-left px-4 py-3  hover:bg-gray-100"
+                        onClick={() => {
+                          setIsDropdownOpen(false)
+                          setIsMenuOpen(false)
+                          logout();
+                        }}
+                      >
+                        <span className="flex text-red-500 hover:text-red-600 items-center">
+                          <LogOut size={18} className="mr-2" />
+                          Logout
+                        </span>
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <Link
+                  href={userLink.href}
+                  className="text-red-500 hover:text-red-600 font-medium transition-colors"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  {userLink.label}
+                </Link>
+              )}
             </div>
           </nav>
         )}

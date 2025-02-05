@@ -3,7 +3,6 @@ import Credentials from "next-auth/providers/credentials";
 import Google from "next-auth/providers/google";
 import { prisma } from "./lib/db";
 import { compare } from "bcryptjs";
-import { profile } from "console";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
@@ -18,11 +17,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       },
 
 
-
       authorize: async (credentials) => {
         const email = credentials.email as string | undefined;
         const password = credentials.password as string | undefined;
-
 
         if (!email || !password) {
           throw new Error("Please provide both email & password");
